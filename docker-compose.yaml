@@ -1,37 +1,42 @@
-version: '4.0'
+version: '3.7'
 services:
   www:
     image: nginx:alpine
+    build:
+      context: ./dockerfile
+      docker: nginx.dockerfile
+    container_name: nginx
     volumes:
-      - 
+      - .
     ports:
-      -
+      - 80:80
     depends_on:
       - backend
       - frontend
 
   backend:
     build:
-      context:
+      context: ./backend
       dockerfile: Dockerfile
+    # keep connection until frontend running
     tty: true
     container_name: backend
     ports:
-      - 8000:8000
+      - '8000:8000'
     volumes:
-      -
+      - ./backend:/
     networks:
       - web
 
-  frontend:
+  frontend:    
     build:
-      context:
+      context: ./frontend
       dockerfile: Dockerfile
     container_name: frontend
     ports:
-      - 
+      - '3000:3000'
     volumes:
-      -
+      - ./frontend:/
     # Connect backend API
     depends_on:
       - backend
@@ -39,18 +44,24 @@ services:
       - web
 
   db:
-    image: mysql //TODO: 
+    image: mysql:8.0
     container_name: mysql
     restart: unless-stopped
-
     ports:
       - "4306:3306"
     environment:
-      - =value
+      - MYSQL_DATABASE: ${DB_DATABASE}
+      - MYSQL_USER: ${DB_USERNAME}
+      #- MYSQL_PASSWORD: 'root'
+      - MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
     volumes:
       -
     networks:
       - web 
+
+  # composer:
+  # artisan:
+  # npm:  
 
 networks:
   web:
