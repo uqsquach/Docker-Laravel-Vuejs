@@ -1,0 +1,57 @@
+version: '4.0'
+services:
+  www:
+    image: nginx:alpine
+    volumes:
+      - 
+    ports:
+      -
+    depends_on:
+      - backend
+      - frontend
+
+  backend:
+    build:
+      context:
+      dockerfile: Dockerfile
+    tty: true
+    container_name: backend
+    ports:
+      - 8000:8000
+    volumes:
+      -
+    networks:
+      - web
+
+  frontend:
+    build:
+      context:
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - 
+    volumes:
+      -
+    # Connect backend API
+    depends_on:
+      - backend
+    networks:
+      - web
+
+  db:
+    image: mysql //TODO: 
+    container_name: mysql
+    restart: unless-stopped
+
+    ports:
+      - "4306:3306"
+    environment:
+      - =value
+    volumes:
+      -
+    networks:
+      - web 
+
+networks:
+  web:
+    driver: bridge
